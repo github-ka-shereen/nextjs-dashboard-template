@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from "react"
- 
-import { Button } from "@/components/ui/button"
+import * as React from 'react';
+
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,57 +10,116 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select';
 import Link from 'next/link';
-import { PersonStandingIcon } from "lucide-react";
+import { PersonStandingIcon } from 'lucide-react';
+import * as z from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { log } from 'console';
+
+const formSchema = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
 
 export default function LogInPage() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const handleSubmit = () => {
+    console.log('LogIn Successful!!');
+    form.reset()
+  };
+
   return (
     <>
-    <PersonStandingIcon size={50}/>
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Log In</CardTitle>
-        <CardDescription>Log In to your Admin Account.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Name of your project" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework">Framework</Label>
-              <Select>
-                <SelectTrigger id="framework">
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  <SelectItem value="next">Next.js</SelectItem>
-                  <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                  <SelectItem value="astro">Astro</SelectItem>
-                  <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-between items-center">
-        <small>Do You Have An Account?</small>
-        <Button asChild variant="outline"><Link href='/sign-up'>Sign Up</Link></Button>
-      </CardFooter>
-    </Card>
+      <Card className='w-full max-w-sm'>
+        <CardHeader>
+          <CardTitle className='uppercase'>Dashboard LogIn</CardTitle>
+          <CardDescription>Log In to your Admin Account.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <div className='grid w-full items-center gap-4'>
+                <div className='flex flex-col space-y-1.5'>
+                  <FormField
+                    control={form.control}
+                    name='email'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            id='email'
+                            placeholder='Enter Your Email'
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          This is the email you used to sign up with...
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className='flex flex-col space-y-4'>
+                  <FormField
+                    control={form.control}
+                    name='password'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type='password'
+                            placeholder='Enter Your Password'
+                            {...field}
+                          />
+                        </FormControl>
+
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type='submit'>LOGIN</Button>
+                </div>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className='flex justify-between items-center'>
+          <small>Do You Have An Account?</small>
+          <Button asChild variant='outline'>
+            <Link href='/sign-up'>SIGNUP</Link>
+          </Button>
+        </CardFooter>
+      </Card>
     </>
   );
 }
