@@ -12,16 +12,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import Link from 'next/link';
-import { PersonStandingIcon } from 'lucide-react';
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,12 +26,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { log } from 'console';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string(),
 });
+
+
 
 export default function LogInPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,9 +44,12 @@ export default function LogInPage() {
     },
   });
 
+    const router = useRouter();
+
   const handleSubmit = () => {
     console.log('LogIn Successful!!');
-    form.reset()
+    form.reset();
+    router.push('/sign-up');
   };
 
   return (
