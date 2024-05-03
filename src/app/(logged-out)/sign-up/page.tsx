@@ -1,7 +1,5 @@
 'use client';
 
-import * as React from 'react';
-
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -36,38 +34,54 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useRouter } from 'next/navigation';
+import { Popover } from '@/components/ui/popover';
+import { PopoverContent, PopoverTrigger } from '@radix-ui/react-popover';
 
-const formSchema = z.object({
-  email: z.string().email(),
-  accountType: z.enum(["personal", "company"]),
-  companyName: z.string().optional(),
-  employees: z.coerce.number().optional(),
-  dob: z.date().refine(() => {
+import { CalendarFoldIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 
-  }, "You must be at least 18 years old"), 
-}).superRefine((data, ctx) => {
-  if(data.accountType === "company" && !data.companyName) {
-     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ["companyName"],
-      message: "Company Name Is Required",
-    })
-  }
-    if (data.accountType === 'company' && (!data.employees || data.employees < 1 )) {
+const formSchema = z
+  .object({
+    email: z.string().email(),
+    accountType: z.enum(['personal', 'company']),
+    companyName: z.string().optional(),
+    employees: z.coerce.number().optional(),
+    dob: z.date().refine((date) => {
+      const today = new Date();
+      const eighteenYearsAgo = new Date(
+        today.getFullYear() - 18,
+        today.getMonth(),
+        today.getFullYear()
+      );
+      return date <= eighteenYearsAgo;
+    }, 'You must be at least 18 years old'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.accountType === 'company' && !data.companyName) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['companyName'],
+        message: 'Company Name Is Required',
+      });
+    }
+    if (
+      data.accountType === 'company' &&
+      (!data.employees || data.employees < 1)
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['employees'],
         message: 'Add Number Of Employees',
       });
     }
-})
+  });
 
 export default function SignUpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-
     },
   });
 
@@ -79,7 +93,7 @@ export default function SignUpPage() {
     router.push('/sign-up');
   };
 
-  const accountType = form.watch("accountType")
+  const accountType = form.watch('accountType');
 
   return (
     <>
@@ -180,7 +194,48 @@ export default function SignUpPage() {
                       </div>
                     </>
                   )}
-                  <Button type='submit'>SUBMIT</Button>
+                  <div className='flex flex-col space-y-1.5'>
+                    <FormField
+                      control={form.control}
+                      name='dob'
+                      render={({ field }) => (
+                        <FormItem className='flex flex-col'>
+                          <FormLabel>Date Of Birth</FormLabel>
+
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <FormControl>
+                                <Button
+                                  variant='outline'
+                                  className='flex justify-between items-center pr-2'
+                                >
+                                  {!!field.value ? (
+                                    format(field.value, 'PPP')
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )}
+                                  <CalendarFoldIcon />
+                                </Button>
+                              </FormControl>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              align='start'
+                              className='w-auto p-0 mb-3'
+                            >
+                              <Calendar
+                                defaultMonth={field.value}
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                mode='single'
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <Button type='submit'>SIGN UP</Button>
                 </div>
               </div>
             </form>
