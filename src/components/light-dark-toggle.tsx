@@ -27,13 +27,13 @@ export function LightDarkToggle({className}:Props) {
           }}
         >
           {isDarkMode ? (
-            <div className='rounded-full border-2 flex items-center gap-2 p-3'>
-              <p>Dark Mode</p>
+            <div className='rounded-full border-2 border-zinc-600 flex items-center gap-2 p-3'>
+              <p>Dark</p>
               <MoonIcon />
             </div>
           ) : (
-            <div className='rounded-full border-2 flex items-center gap-2 p-3'>
-              <p>Light Mode</p>
+            <div className='rounded-full border-2  flex items-center gap-2 p-3'>
+              <p>Light</p>
               <SunIcon />
             </div>
           )}

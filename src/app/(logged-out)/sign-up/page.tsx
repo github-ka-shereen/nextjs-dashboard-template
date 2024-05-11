@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 
 import Link from 'next/link';
 import * as z from 'zod';
@@ -24,6 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+
 import {
   Select,
   SelectContent,
@@ -40,22 +42,13 @@ import { PopoverContent, PopoverTrigger } from '@radix-ui/react-popover';
 import { CalendarFoldIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import { Checkbox } from '@/components/ui/checkbox';
 
-const formSchema = z
+const accountTypeSchema = z
   .object({
-    email: z.string().email(),
     accountType: z.enum(['personal', 'company']),
     companyName: z.string().optional(),
     employees: z.coerce.number().optional(),
-    dob: z.date().refine((date) => {
-      const today = new Date();
-      const eighteenYearsAgo = new Date(
-        today.getFullYear() - 18,
-        today.getMonth(),
-        today.getFullYear()
-      );
-      return date <= eighteenYearsAgo;
-    }, 'You must be at least 18 years old'),
   })
   .superRefine((data, ctx) => {
     if (data.accountType === 'company' && !data.companyName) {
@@ -77,20 +70,62 @@ const formSchema = z
     }
   });
 
+const passwordSchema = z
+  .object({
+    password: z.string().refine((password) => {
+      return /^(?=.*[A-Z])(?=.*[@])[A-Za-z\d@#$%^&*!]{8,}$/.test(password);
+    }, 'Password must contain at least 8 characters, least one special character and one uppercase character'),
+    passwordConfirm: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.passwordConfirm) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['passwordConfirm'],
+        message: 'Passwords Do Not Match',
+      });
+    }
+  });
+
+const baseSchema = z.object({
+  email: z.string().email(),
+  dob: z.date().refine((date) => {
+    const today = new Date();
+    const eighteenYearsAgo = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getFullYear()
+    );
+    return date <= eighteenYearsAgo;
+  }, 'You must be at least 18 years old'),
+  acceptTerms: z
+    .boolean({
+      required_error: 'You Must Accept The Terms And Conditions',
+    })
+    .refine((checked) => checked, 'You Must Accept The Terms And Conditions'),
+});
+
+const formSchema = baseSchema.and(passwordSchema).and(accountTypeSchema);
+
 export default function SignUpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
+      password: '',
+      passwordConfirm: '',
+      companyName: '',
+      accountType: undefined,
+      acceptTerms: false,
     },
   });
 
   const router = useRouter();
 
-  const handleSubmit = () => {
-    console.log('LogIn Successful!!');
+  const handleSubmit = (data: z.infer<typeof formSchema>) => {
+    console.log('LogIn Successful!!', data);
     form.reset();
-    router.push('/sign-up');
+    // router.push('/dashboard');
   };
 
   const accountType = form.watch('accountType');
@@ -144,7 +179,6 @@ export default function SignUpPage() {
                             <SelectItem value='company'>Company</SelectItem>
                           </SelectContent>
                         </Select>
-
                         <FormMessage />
                       </FormItem>
                     )}
@@ -184,6 +218,7 @@ export default function SignUpPage() {
                                   type='number'
                                   min={0}
                                   {...field}
+                                  value={field.value ?? ''}
                                 />
                               </FormControl>
 
@@ -194,7 +229,7 @@ export default function SignUpPage() {
                       </div>
                     </>
                   )}
-                  <div className='flex flex-col space-y-1.5'>
+                  <div className='flex flex-col space-y-1.5 z-10'>
                     <FormField
                       control={form.control}
                       name='dob'
@@ -235,6 +270,79 @@ export default function SignUpPage() {
                       )}
                     />
                   </div>
+                  <div className='flex flex-col space-y-1.5'>
+                    <FormField
+                      control={form.control}
+                      name='password'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <PasswordInput
+                              id='password'
+                              placeholder='Enter Your Password'
+                              {...field}
+                            />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className='flex flex-col space-y-1.5'>
+                    <FormField
+                      control={form.control}
+                      name='passwordConfirm'
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Confirm Password</FormLabel>
+                          <FormControl>
+                            <PasswordInput
+                              id='passwordConfirm'
+                              placeholder='Re-Type Your Password'
+                              {...field}
+                            />
+                          </FormControl>
+
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className='flex flex-col space-y-1.5'>
+                    <FormField
+                      control={form.control}
+                      name='acceptTerms'
+                      render={({ field }) => (
+                        <FormItem>
+                          <div className='flex gap-2 items-center'>
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <FormLabel>
+                              I accept the terms and conditions
+                            </FormLabel>
+                          </div>
+                          <FormDescription>
+                            By signing up you agree to our{' '}
+                            <Link
+                              className='text-primary hover:underline transition-all duration-300 '
+                              href='/terms-and-conditions'
+                            >
+                              Terms And Conditions
+                            </Link>
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <Button type='submit'>SIGN UP</Button>
                 </div>
               </div>

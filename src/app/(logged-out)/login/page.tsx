@@ -27,13 +27,12 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { useRouter } from 'next/navigation';
+import { PasswordInput } from '@/components/ui/password-input';
 
 const formSchema = z.object({
   email: z.string().email(),
   password: z.string(),
 });
-
-
 
 export default function LogInPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,12 +43,12 @@ export default function LogInPage() {
     },
   });
 
-    const router = useRouter();
+  const router = useRouter();
 
-  const handleSubmit = () => {
-    console.log('LogIn Successful!!');
+  const handleSubmit = (data: z.infer<typeof formSchema>) => {
+    console.log('LogIn Successful!!', data);
     form.reset();
-    router.push('/sign-up');
+    // router.push('/dashboard');
   };
 
   return (
@@ -93,8 +92,7 @@ export default function LogInPage() {
                       <FormItem>
                         <FormLabel>Password</FormLabel>
                         <FormControl>
-                          <Input
-                            type='password'
+                          <PasswordInput
                             placeholder='Enter Your Password'
                             {...field}
                           />
