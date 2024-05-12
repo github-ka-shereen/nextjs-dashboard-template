@@ -22,7 +22,6 @@ type Props = {
 };
 
 export function LightDarkToggle({ className }: Props) {
-
   const { setTheme } = useTheme();
 
   return (
