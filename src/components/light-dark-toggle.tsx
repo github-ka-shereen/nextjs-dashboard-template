@@ -8,40 +8,46 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { MoonIcon, SunIcon } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { Button } from './ui/button';
 
 type Props = {
-    className?: string;
-}
+  className?: string;
+};
 
-export function LightDarkToggle({className}:Props) {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+export function LightDarkToggle({ className }: Props) {
+
+  const { setTheme } = useTheme();
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger
-          className={className}
-          onClick={() => {
-            setIsDarkMode((prevValue) => !prevValue);
-            document.body.classList.toggle('dark');
-          }}
-        >
-          {isDarkMode ? (
-            <div className='rounded-full border-2 border-zinc-600 flex items-center gap-2 p-3'>
-              <p>Dark</p>
-              <MoonIcon />
-            </div>
-          ) : (
-            <div className='rounded-full border-2  flex items-center gap-2 p-3'>
-              <p>Light</p>
-              <SunIcon />
-            </div>
-          )}
-        </TooltipTrigger>
-        <TooltipContent>
-          {isDarkMode ? 'Enable light mode' : 'Enable dark  mode'}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div className={className}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant='outline' size='icon'>
+            <SunIcon className='h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0' />
+            <MoonIcon className='absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100' />
+            <span className='sr-only'>Toggle theme</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className='cursor-pointer' align='end'>
+          <DropdownMenuItem onClick={() => setTheme('light')}>
+            Light Mode
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setTheme('dark')}>
+            Dark Mode
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setTheme('system')}>
+            System Preference
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
+  // );
 }

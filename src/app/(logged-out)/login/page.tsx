@@ -48,7 +48,7 @@ export default function LogInPage() {
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     console.log('LogIn Successful!!', data);
     form.reset();
-    // router.push('/dashboard');
+    router.push('/dashboard');
   };
 
   return (
