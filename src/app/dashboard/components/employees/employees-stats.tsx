@@ -60,7 +60,7 @@ export default function EmployeesStats() {
           </CardContent>
           <CardFooter>
             {employeesPresentPercentage > 75 ? (
-              <span className='text-xs text-green-500 flex items-center gap-1'>
+              <span className='text-xs text-green-700 flex items-center gap-1'>
                 <BadgeCheckIcon />
                 {employeesPresentPercentage}% of employees are present
               </span>

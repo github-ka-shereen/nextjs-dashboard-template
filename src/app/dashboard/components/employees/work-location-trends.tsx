@@ -107,10 +107,10 @@ export default function WorkLocationTrends() {
         <Bar
           dataKey='office'
           stackId={1}
-          fill='#393E41'
-          radius={[0, 10, 0, 0]}
+          fill='#b37464'
+          radius={[12, 12, 0, 0]}
         />
-        <Bar dataKey='wfh' stackId={2} fill='#6A8D92' radius={[0, 10, 0, 0]} />
+        <Bar dataKey='wfh' stackId={2} fill='#6a9282' radius={[12, 12, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
