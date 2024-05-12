@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils';
 
 export default function MainMenu({className}: {className?: string}) {
   return (
-    <nav className={cn(`bg-muted overflow-auto p-4 flex flex-col`, className)}>
+    <nav
+      className={cn(`bg-muted overflow-auto p-4 flex flex-col`, className)}
+    >
       <header className='border-b dark:border-b-gray-500 border-b-gray-400 pb-4'>
         <MenuTitleLogo />
       </header>

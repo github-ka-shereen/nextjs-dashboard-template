@@ -18,7 +18,7 @@ export default function DashboardLayout({
         {!isDesktopMode && <MobileMenu />}
       </div>
       <div className='overflow-auto py-2 px-4'>
-        <h1 className='pb-4 '>Welcome back, Paradzai</h1>
+        <h1 className='pb-4'>Welcome back, Paradzai</h1>
         {children}
       </div>
     </div>
